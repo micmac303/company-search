@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +33,7 @@ class CompanySearchControllerTest {
                 .companyName("companyName")
                 .companyNumber("companyNumber")
                 .build();
-        when(truProxyApiService.getCompaniesAndOfficers(anyString(), anyString())).thenReturn(new CompanySearchResponse());
+        when(truProxyApiService.getCompaniesAndOfficers(anyString(), anyString(), anyBoolean(), anyString())).thenReturn(new CompanySearchResponse());
 
         var companySearchResponse = companySearchController
                 .companySearch(companySearchRequest, activeCompanies, apiKey);
