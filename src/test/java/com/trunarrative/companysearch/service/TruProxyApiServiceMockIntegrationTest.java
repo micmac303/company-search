@@ -1,5 +1,6 @@
 package com.trunarrative.companysearch.service;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,10 +9,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest @Disabled
-class TruProxyApiServiceIntegrationTest {
+class TruProxyApiServiceMockIntegrationTest {
+
+    private static WireMockServer wireMockServer;
 
     @Autowired
-    private TruProxyApiService truProxyApiService;
+    private TruProxyApiService truProxyApiService;  // TruProxyApiService is not mocked but should be with wiremock
+
+    //Test 1, Compnay number / true / false
+    //Test 2, Name and Number / true / false
+    //Test 3, Company name (query) / true / false
+    // Active companies
+    // Not Resigned officers
 
     @Test
     void getCompaniesShouldReturnASingleCompanyForTrunarrative() {
