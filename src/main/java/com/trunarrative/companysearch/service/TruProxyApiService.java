@@ -1,5 +1,7 @@
 package com.trunarrative.companysearch.service;
 
+import com.trunarrative.companysearch.model.Company;
+import com.trunarrative.companysearch.model.CompanySearchResponse;
 import com.trunarrative.companysearch.model.TruProxyApiCompaniesResponse;
 import com.trunarrative.companysearch.model.TruProxyApiOfficersResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,15 +25,24 @@ public class TruProxyApiService {
     private static final String COMPANY_OFFICERS_URL =
             "https://exercise.trunarrative.cloud/TruProxyAPI/rest/Companies/v1/Officers?CompanyNumber=";
 
-    //Get List of Companies from company name search
-    //for each company call officers endpoint and get the list of officers
-    //create the response that contains the list of companies and their officers
+    public CompanySearchResponse getCompaniesAndOfficers(String companyName, String companyNumber, boolean activeCompanies, String apiKey) {
 
-    public TruProxyApiCompaniesResponse getCompanies(String companyName, String companyNumber) {
+        TruProxyApiCompaniesResponse companiesResponse = getCompanies(companyName, companyNumber, activeCompanies, apiKey);
 
+        CompanySearchResponse companySearchResponse = new CompanySearchResponse();
+        companySearchResponse.setItems(companiesResponse.getItems());
+        companySearchResponse.setTotalResults(companiesResponse.getItems().size());
+        for (Company company : companySearchResponse.getItems()) {
+            TruProxyApiOfficersResponse officersResponse = getOfficers(company.getCompanyNumber(), apiKey);
+            company.setOfficers(officersResponse.getItems());
+        }
+        return companySearchResponse;
+    }
+
+    public TruProxyApiCompaniesResponse getCompanies(String companyName, String companyNumber, boolean activeCompanies, String apiKey) {
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("x-api-key", "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+        headers.set("x-api-key", apiKey);
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
 
         ResponseEntity<TruProxyApiCompaniesResponse> response;
@@ -59,10 +70,10 @@ public class TruProxyApiService {
         }
     }
 
-    public TruProxyApiOfficersResponse getOfficers(String companyNumber) {
+    public TruProxyApiOfficersResponse getOfficers(String companyNumber, String apiKey) {
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("x-api-key", "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+        headers.set("x-api-key", apiKey);
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
 
         ResponseEntity<TruProxyApiOfficersResponse> response =

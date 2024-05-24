@@ -2,9 +2,12 @@ package com.trunarrative.companysearch.model;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class CompanySearchResponse {
 
-    private Officer officer;
+    private int totalResults;
+    private List<Company> items;
 }
 

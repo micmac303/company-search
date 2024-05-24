@@ -3,6 +3,8 @@ package com.trunarrative.companysearch.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class Company {
 
@@ -16,4 +18,5 @@ public class Company {
     @JsonProperty("date_of_creation")
     private String dateOfCreation;
     private Address address;
+    private List<Officer> officers;
 }
