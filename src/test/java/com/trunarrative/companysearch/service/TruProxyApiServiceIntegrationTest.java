@@ -16,7 +16,7 @@ class TruProxyApiServiceIntegrationTest {
     @Test
     void getCompaniesShouldReturnASingleCompanyForTrunarrative() {
 
-        var response = truProxyApiService.getCompanies("trunarrative", "06500244", true, "API-KEY");
+        var response = truProxyApiService.getCompaniesAndOfficers("trunarrative", "06500244", true, "API-KEY");
 
         assertThat(response).isNotNull();
         assertThat(response.getItems()).isNotEmpty();
@@ -30,7 +30,7 @@ class TruProxyApiServiceIntegrationTest {
     @Test
     void getCompaniesShouldReturnMultipleCompaniesForBbc() {
 
-        var response = truProxyApiService.getCompanies("bbc", "12345123", true,"API-KEY");
+        var response = truProxyApiService.getCompaniesAndOfficers("bbc", "12345123",true, "API-KEY");
 
         assertThat(response).isNotNull();
         assertThat(response.getItems()).isNotEmpty();
@@ -41,7 +41,7 @@ class TruProxyApiServiceIntegrationTest {
     @Test
     void getOfficersShouldReturnOfficersForTrunarrative() {
 
-        var response = truProxyApiService.getOfficers("10241297", "API-KEY");
+        var response = truProxyApiService.getCompaniesAndOfficers("acme", "10241297", true, "API-KEY");
 
         assertThat(response.getItems()).isNotNull();
         assertThat(response.getItems().size()).isGreaterThan(1);

@@ -7,5 +7,5 @@ import java.util.List;
 @Data
 public class TruProxyApiOfficersResponse {
 
-    List<Officer> items;
+    List<TruProxyOfficer> items;
 }

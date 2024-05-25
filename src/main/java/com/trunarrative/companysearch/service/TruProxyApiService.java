@@ -1,17 +1,19 @@
 package com.trunarrative.companysearch.service;
 
-import com.trunarrative.companysearch.model.Company;
 import com.trunarrative.companysearch.model.CompanySearchResponse;
+import com.trunarrative.companysearch.model.Officer;
 import com.trunarrative.companysearch.model.TruProxyApiCompaniesResponse;
 import com.trunarrative.companysearch.model.TruProxyApiOfficersResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpServerErrorException;
+
+import static io.micrometer.common.util.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
 @RequiredArgsConstructor
@@ -19,74 +21,72 @@ public class TruProxyApiService {
 
     private final RestTemplateBuilder restTemplateBuilder;
 
-    private static final String COMPANY_SEARCH_URL =
+    private static final String COMPANIES_URL =
             "https://exercise.trunarrative.cloud/TruProxyAPI/rest/Companies/v1/Search?Query=";
-
-    private static final String COMPANY_OFFICERS_URL =
+    private static final String OFFICERS_URL =
             "https://exercise.trunarrative.cloud/TruProxyAPI/rest/Companies/v1/Officers?CompanyNumber=";
 
     public CompanySearchResponse getCompaniesAndOfficers(String companyName, String companyNumber, boolean activeCompanies, String apiKey) {
 
-        TruProxyApiCompaniesResponse companiesResponse = getCompanies(companyName, companyNumber, activeCompanies, apiKey);
+        var truProxyApiCompaniesResponse = getCompanies(companyName, companyNumber, apiKey);
+        var companySearchResponse = new CompanySearchResponse();
 
-        CompanySearchResponse companySearchResponse = new CompanySearchResponse();
-        companySearchResponse.setItems(companiesResponse.getItems());
-        companySearchResponse.setTotalResults(companiesResponse.getItems().size());
-        for (Company company : companySearchResponse.getItems()) {
-            TruProxyApiOfficersResponse officersResponse = getOfficers(company.getCompanyNumber(), apiKey);
-            company.setOfficers(officersResponse.getItems());
-        }
+        var companies = (activeCompanies)
+                ? truProxyApiCompaniesResponse.getItems().stream().filter(company -> "active".equals(company.getCompanyStatus())).toList()
+                : truProxyApiCompaniesResponse.getItems();
+
+        companies.forEach(company -> {
+            var officersResponse = getOfficers(company.getCompanyNumber(), apiKey);
+            var workingTruProxyOfficers = officersResponse.getItems().stream()
+                    .filter(officer -> isBlank(officer.getResignedOn())).toList();
+            var workingOfficers = workingTruProxyOfficers.stream()
+                    .map(truProxyOfficer -> {
+                        Officer officer = new Officer();
+                        BeanUtils.copyProperties(truProxyOfficer, officer);
+                        return officer;
+                    }).toList();
+
+            company.setOfficers(workingOfficers);
+        });
+
+        companySearchResponse.setTotalResults(companies.size());
+        companySearchResponse.setItems(companies);
         return companySearchResponse;
     }
 
-    public TruProxyApiCompaniesResponse getCompanies(String companyName, String companyNumber, boolean activeCompanies, String apiKey) {
+    private TruProxyApiCompaniesResponse getCompanies(String companyName, String companyNumber, String apiKey) {
 
-        HttpHeaders headers = new HttpHeaders();
+        var headers = new HttpHeaders();
         headers.set("x-api-key", apiKey);
-        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        var httpEntity = new HttpEntity<>(headers);
 
-        ResponseEntity<TruProxyApiCompaniesResponse> response;
-        if (companyNumber != null) {
-
-            response = restTemplateBuilder.build().exchange(
-                            COMPANY_SEARCH_URL + companyNumber,
+        var response = isNotBlank(companyNumber)
+            ? restTemplateBuilder.build()
+                .exchange(COMPANIES_URL + companyNumber,
+                            HttpMethod.GET,
+                            httpEntity,
+                            TruProxyApiCompaniesResponse.class)
+            : restTemplateBuilder.build()
+                .exchange(COMPANIES_URL + companyName,
                             HttpMethod.GET,
                             httpEntity,
                             TruProxyApiCompaniesResponse.class);
-        }
-        else {
 
-            response = restTemplateBuilder.build().exchange(
-                            COMPANY_SEARCH_URL + companyName,
-                            HttpMethod.GET,
-                            httpEntity,
-                            TruProxyApiCompaniesResponse.class);
-        }
-
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return response.getBody();
-        } else {
-            throw new HttpServerErrorException(response.getStatusCode());
-        }
+        return response.getBody();
     }
 
-    public TruProxyApiOfficersResponse getOfficers(String companyNumber, String apiKey) {
+    private TruProxyApiOfficersResponse getOfficers(String companyNumber, String apiKey) {
 
-        HttpHeaders headers = new HttpHeaders();
+        var headers = new HttpHeaders();
         headers.set("x-api-key", apiKey);
-        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        var httpEntity = new HttpEntity<>(headers);
 
-        ResponseEntity<TruProxyApiOfficersResponse> response =
-                restTemplateBuilder.build().exchange(
-                        COMPANY_OFFICERS_URL + companyNumber,
-                        HttpMethod.GET,
-                        httpEntity,
-                        TruProxyApiOfficersResponse.class);
+        var response = restTemplateBuilder.build()
+                .exchange(OFFICERS_URL + companyNumber,
+                            HttpMethod.GET,
+                            httpEntity,
+                            TruProxyApiOfficersResponse.class);
 
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return response.getBody();
-        } else {
-            throw new HttpServerErrorException(response.getStatusCode());
-        }
+        return response.getBody();
     }
 }
