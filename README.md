@@ -4,6 +4,9 @@ Company Search Service (Developer test for Trunarrative)
 
 ## Running the application
 ./gradlew bootRun
+Navigate to http://localhost:8080/swagger-ui/index.html
+
+
 
 ### Development notes
 RestTemplateBuilder creates thread safe RestTemplate instances.

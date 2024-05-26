@@ -1,10 +1,9 @@
 package com.trunarrative.companysearch.service;
 
-import com.trunarrative.companysearch.model.CompanySearchResponse;
-import com.trunarrative.companysearch.model.Officer;
-import com.trunarrative.companysearch.model.TruProxyApiCompaniesResponse;
-import com.trunarrative.companysearch.model.TruProxyApiOfficersResponse;
+import com.trunarrative.companysearch.model.*;
+import com.trunarrative.companysearch.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -12,14 +11,17 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static io.micrometer.common.util.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor @Slf4j
 public class TruProxyApiService {
 
     private final RestTemplateBuilder restTemplateBuilder;
+    private final CompanyRepository companyRepository;
 
     private static final String COMPANIES_URL =
             "https://exercise.trunarrative.cloud/TruProxyAPI/rest/Companies/v1/Search?Query=";
@@ -29,11 +31,9 @@ public class TruProxyApiService {
     public CompanySearchResponse getCompaniesAndOfficers(String companyName, String companyNumber, boolean activeCompanies, String apiKey) {
 
         var truProxyApiCompaniesResponse = getCompanies(companyName, companyNumber, apiKey);
-        var companySearchResponse = new CompanySearchResponse();
+        var companySearchResponse = CompanySearchResponse.builder().build();
 
-        var companies = (activeCompanies)
-                ? truProxyApiCompaniesResponse.getItems().stream().filter(company -> "active".equals(company.getCompanyStatus())).toList()
-                : truProxyApiCompaniesResponse.getItems();
+        List<Company> companies = truProxyApiCompaniesResponse.getItems() != null ? truProxyApiCompaniesResponse.getItems() : List.of();
 
         companies.forEach(company -> {
             var officersResponse = getOfficers(company.getCompanyNumber(), apiKey);
@@ -48,6 +48,12 @@ public class TruProxyApiService {
 
             company.setOfficers(workingOfficers);
         });
+
+        companyRepository.saveAll(companies);
+
+        companies = (activeCompanies)
+                ? companies.stream().filter(company -> "active".equals(company.getCompanyStatus())).toList()
+                : companies;
 
         companySearchResponse.setTotalResults(companies.size());
         companySearchResponse.setItems(companies);
