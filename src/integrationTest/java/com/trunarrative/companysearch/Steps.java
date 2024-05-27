@@ -1,6 +1,5 @@
 package com.trunarrative.companysearch;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
 import io.cucumber.java8.En;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;

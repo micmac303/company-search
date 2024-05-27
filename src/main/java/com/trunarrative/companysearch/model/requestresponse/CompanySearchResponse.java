@@ -1,5 +1,6 @@
-package com.trunarrative.companysearch.model;
+package com.trunarrative.companysearch.model.requestresponse;
 
+import com.trunarrative.companysearch.model.Company;
 import lombok.Builder;
 import lombok.Data;
 

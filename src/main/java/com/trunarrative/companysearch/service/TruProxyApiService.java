@@ -1,6 +1,10 @@
 package com.trunarrative.companysearch.service;
 
-import com.trunarrative.companysearch.model.*;
+import com.trunarrative.companysearch.model.Company;
+import com.trunarrative.companysearch.model.Officer;
+import com.trunarrative.companysearch.model.requestresponse.CompanySearchResponse;
+import com.trunarrative.companysearch.model.truproxy.TruProxyApiCompaniesResponse;
+import com.trunarrative.companysearch.model.truproxy.TruProxyApiOfficersResponse;
 import com.trunarrative.companysearch.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

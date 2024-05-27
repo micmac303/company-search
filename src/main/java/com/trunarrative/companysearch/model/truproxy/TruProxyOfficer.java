@@ -1,6 +1,7 @@
-package com.trunarrative.companysearch.model;
+package com.trunarrative.companysearch.model.truproxy;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.trunarrative.companysearch.model.Address;
 import lombok.Data;
 
 import java.time.LocalDate;

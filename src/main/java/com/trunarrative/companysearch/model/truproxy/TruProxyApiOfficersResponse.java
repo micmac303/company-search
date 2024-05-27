@@ -1,4 +1,4 @@
-package com.trunarrative.companysearch.model;
+package com.trunarrative.companysearch.model.truproxy;
 
 import lombok.Data;
 

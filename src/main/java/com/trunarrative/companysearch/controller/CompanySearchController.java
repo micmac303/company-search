@@ -1,7 +1,7 @@
 package com.trunarrative.companysearch.controller;
 
-import com.trunarrative.companysearch.model.CompanySearchRequest;
-import com.trunarrative.companysearch.model.CompanySearchResponse;
+import com.trunarrative.companysearch.model.requestresponse.CompanySearchRequest;
+import com.trunarrative.companysearch.model.requestresponse.CompanySearchResponse;
 import com.trunarrative.companysearch.repository.CompanyRepository;
 import com.trunarrative.companysearch.service.TruProxyApiService;
 import lombok.RequiredArgsConstructor;
