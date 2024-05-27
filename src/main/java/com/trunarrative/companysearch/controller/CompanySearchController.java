@@ -47,7 +47,7 @@ public class CompanySearchController {
             }
         }
 
-        log.info("Either no company number supplied or company not returned from the database, calling TruProxy API");
+        log.info("Company not returned from the database, calling TruProxy API");
         var companySearchResponse = truProxyApiService.getCompaniesAndOfficers(
                 companySearchRequest.getCompanyName(), companySearchRequest.getCompanyNumber(), activeCompanies, apiKey);
 

@@ -1,32 +1,39 @@
-# company-search
+# *Developer Test:* company-search REST API
 
-Company Search Service (Developer test for Trunarrative) 
+Company Search Service ( **spring-service** Developer test for Trunarrative) 
 
 ## Running the application
-./gradlew bootRun
+Build the project using *./gradlew build* from the root of the project.
+Execute *./gradlew bootRun* from the root of the project to start the application.
+
 Navigate to http://localhost:8080/swagger-ui/index.html
 
+Calls can be made from this interface or from a tool such as Postman.
 
+The **API Key is required as a parameter** in the request so that it is not added to the git repository.
 
-### Development notes
-RestTemplateBuilder creates thread safe RestTemplate instances.
-HttpServerErrorException ?
-API Key as a parameter in the request so that it is not added to the git repository.
-Records instead of Classes?
-Something better than get(0) ?
+Example unit tests provided for the controller and service classes.
 
-Defensive database exception handling implemented despite the fact that the database is in memory and should not throw exceptions.
+Example integration test provided using Wiremock and Cucumber BDD
+with Testcontainers so require Docker to be installed and running.
 
-Fetch Comapnies and officers from database handled by the controller so as not to even call the truproxyservice.
+*./gradlew test* will run the unit tests.
 
-Companies saved with full list of working officers when fetch from truproxy api in truproxy api service
+*./gradlew integrationTest* will run the integration tests.
 
-200 with empty result over 404 easier for clients
-Bad request
-Exception - Return 400?
+*./gradlew check* will run both the unit and integration tests.
 
-Wiremocek implemented as bundled with stubbed files for simplicity
-    - considered more complex testcontianers approach but did not want to assume Docker installation
+Results can be seen at *build/reports/tests/test/index.html*
 
+and *build/reports/tests/integrationTest/index.html*
+
+## Development notes
+Use of RestTemplateBuilder creates thread safe RestTemplate instances.
+
+Defensive database exception handling implemented as example code despite the fact that the database is in memory (HyperSQL) and will not have network connectivity exceptions.
+
+Fetching of companies and officers from the database handled by the controller rather than TruProxyService as example of single responsibility principle and separation of concerns.
+
+Companies saved with full list of working officers when fetched from TruProxyAPI.
 
 

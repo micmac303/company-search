@@ -50,13 +50,9 @@ tasks.register('integrationTest', Test) {
 	shouldRunAfter test
 }
 
-
-
 tasks.named('integrationTest') {
 	useJUnitPlatform()
 }
-
-
 
 
 check.dependsOn integrationTest
