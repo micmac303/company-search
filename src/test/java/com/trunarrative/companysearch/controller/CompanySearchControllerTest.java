@@ -76,6 +76,7 @@ class CompanySearchControllerTest {
                 .build();
 
         var company = new Company();
+        company.setCompanyStatus("active");
         when(companyRepository.findByCompanyNumber("companyNumber")).thenReturn(company);
 
         var response = companySearchController.companySearch(companySearchRequest, activeCompanies, apiKey);
@@ -98,6 +99,7 @@ class CompanySearchControllerTest {
                 .build();
 
         var company = new Company();
+        company.setCompanyStatus("active");
         when(companyRepository.findByCompanyNumber("companyNumber")).thenReturn(company);
 
         var response = companySearchController.companySearch(companySearchRequest, activeCompanies, apiKey);
