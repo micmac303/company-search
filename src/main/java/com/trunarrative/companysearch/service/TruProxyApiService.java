@@ -5,6 +5,7 @@ import com.trunarrative.companysearch.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,10 +24,11 @@ public class TruProxyApiService {
     private final RestTemplateBuilder restTemplateBuilder;
     private final CompanyRepository companyRepository;
 
-    private static final String COMPANIES_URL =
-            "https://exercise.trunarrative.cloud/TruProxyAPI/rest/Companies/v1/Search?Query=";
-    private static final String OFFICERS_URL =
-            "https://exercise.trunarrative.cloud/TruProxyAPI/rest/Companies/v1/Officers?CompanyNumber=";
+    @Value("${company.search.url}")
+    private String companySearchUrl;
+
+    @Value("${company.officers.url}")
+    private String companyOfficersUrl;
 
     public CompanySearchResponse getCompaniesAndOfficers(String companyName, String companyNumber, boolean activeCompanies, String apiKey) {
 
@@ -70,12 +72,12 @@ public class TruProxyApiService {
 
         var response = isNotBlank(companyNumber)
             ? restTemplateBuilder.build()
-                .exchange(COMPANIES_URL + companyNumber,
+                .exchange(companySearchUrl + companyNumber,
                             HttpMethod.GET,
                             httpEntity,
                             TruProxyApiCompaniesResponse.class)
             : restTemplateBuilder.build()
-                .exchange(COMPANIES_URL + companyName,
+                .exchange(companySearchUrl + companyName,
                             HttpMethod.GET,
                             httpEntity,
                             TruProxyApiCompaniesResponse.class);
@@ -90,7 +92,7 @@ public class TruProxyApiService {
         var httpEntity = new HttpEntity<>(headers);
 
         var response = restTemplateBuilder.build()
-                .exchange(OFFICERS_URL + companyNumber,
+                .exchange(companyOfficersUrl + companyNumber,
                             HttpMethod.GET,
                             httpEntity,
                             TruProxyApiOfficersResponse.class);
