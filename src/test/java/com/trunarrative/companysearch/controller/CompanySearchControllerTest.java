@@ -21,14 +21,14 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CompanySearchControllerTest {
 
-    @InjectMocks
-    private CompanySearchController companySearchController;
-
     @Mock
     private TruProxyApiService truProxyApiService;
 
     @Mock
     private CompanyRepository companyRepository;
+
+    @InjectMocks
+    private CompanySearchController companySearchController;
 
     @Test
     void shouldUseCompanyNameForTruProxyApiQueryIfCompanyNumberNotSupplied() {

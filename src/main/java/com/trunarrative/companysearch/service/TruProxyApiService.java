@@ -31,9 +31,12 @@ public class TruProxyApiService {
     public CompanySearchResponse getCompaniesAndOfficers(String companyName, String companyNumber, boolean activeCompanies, String apiKey) {
 
         var truProxyApiCompaniesResponse = getCompanies(companyName, companyNumber, apiKey);
-        var companySearchResponse = CompanySearchResponse.builder().build();
 
         List<Company> companies = truProxyApiCompaniesResponse.getItems() != null ? truProxyApiCompaniesResponse.getItems() : List.of();
+
+        companies = (activeCompanies)
+                ? companies.stream().filter(company -> "active".equals(company.getCompanyStatus())).toList()
+                : companies;
 
         companies.forEach(company -> {
             var officersResponse = getOfficers(company.getCompanyNumber(), apiKey);
@@ -49,12 +52,11 @@ public class TruProxyApiService {
             company.setOfficers(workingOfficers);
         });
 
-        companyRepository.saveAll(companies);
+        if (!companies.isEmpty()) {
+            companyRepository.saveAll(companies);
+        }
 
-        companies = (activeCompanies)
-                ? companies.stream().filter(company -> "active".equals(company.getCompanyStatus())).toList()
-                : companies;
-
+        var companySearchResponse = CompanySearchResponse.builder().build();
         companySearchResponse.setTotalResults(companies.size());
         companySearchResponse.setItems(companies);
         return companySearchResponse;

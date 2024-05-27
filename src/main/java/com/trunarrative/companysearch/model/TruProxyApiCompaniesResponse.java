@@ -9,6 +9,6 @@ import java.util.List;
 public class TruProxyApiCompaniesResponse {
 
     @JsonProperty("total_results")
-    private String totalResults;
+    private int totalResults;
     private List<Company> items;
 }
