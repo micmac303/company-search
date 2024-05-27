@@ -40,6 +40,7 @@ public class CompanySearchController {
                     log.info("Company found in database: {}", company);
                     var companySearchResponse = CompanySearchResponse.builder().totalResults(1).items(List.of(company)).build();
                     if (activeCompanies && !"active".equals(company.getCompanyStatus())) {
+                        log.info("Company is not active, returning empty response");
                         companySearchResponse = CompanySearchResponse.builder().totalResults(0).items(List.of()).build();
                     }
                     return ResponseEntity.ok(companySearchResponse);
