@@ -45,6 +45,8 @@ public class TruProxyApiService {
                 ? companies.stream().filter(company -> "active".equals(company.getCompanyStatus())).toList()
                 : companies;
 
+        log.info("Number of companies found: {}", companies.size());
+
         companies.forEach(company -> {
             var officersResponse = getOfficers(company.getCompanyNumber(), apiKey);
             var workingTruProxyOfficers = officersResponse.getItems().stream()
@@ -59,7 +61,7 @@ public class TruProxyApiService {
             company.setOfficers(workingOfficers);
         });
 
-        if (!companies.isEmpty() && isNotBlank(companyNumber)) {
+        if (!companies.isEmpty() && isNotBlank(companyNumber) && companyNumber.length() == 8) {
                 companyRepository.saveAll(companies);
         }
 
@@ -96,12 +98,21 @@ public class TruProxyApiService {
         headers.set("x-api-key", apiKey);
         var httpEntity = new HttpEntity<>(headers);
 
-        var response = restTemplateBuilder.build()
-                .exchange(companyOfficersUrl + companyNumber,
+        try {
+            var response = restTemplateBuilder.build()
+                    .exchange(companyOfficersUrl + companyNumber,
                             HttpMethod.GET,
                             httpEntity,
                             TruProxyApiOfficersResponse.class);
 
-        return response.getBody();
+            log.info(response.getStatusCode().toString());
+            return response.getBody();
+        }
+        catch (Exception e) {
+            log.error("Error fetching officers from TruProxy API");
+            var emptyResponse = new TruProxyApiOfficersResponse();
+            emptyResponse.setItems(List.of());
+            return emptyResponse;
+        }
     }
 }

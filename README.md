@@ -46,3 +46,9 @@ Defensive database exception handling implemented as example code despite the fa
 Fetching of companies and officers from the database handled by the controller rather than TruProxyService as example of single responsibility principle and separation of concerns.
 
 Companies saved with full list of working officers after being fetched from TruProxyAPI.
+
+Valid format of the company number not specified in the requirements so validation not implemented.
+
+## Future improvements
+Add more unit tests for the TruProxyService classes.
+Add more integration tests.
