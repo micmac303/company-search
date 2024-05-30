@@ -6,7 +6,6 @@ import com.trunarrative.companysearch.model.requestresponse.CompanySearchRespons
 import com.trunarrative.companysearch.model.truproxy.TruProxyApiCompaniesResponse;
 import com.trunarrative.companysearch.model.truproxy.TruProxyApiOfficersResponse;
 import com.trunarrative.companysearch.repository.CompanyRepository;
-import jakarta.persistence.UniqueConstraint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;

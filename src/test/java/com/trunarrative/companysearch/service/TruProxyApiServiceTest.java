@@ -139,4 +139,115 @@ class TruProxyApiServiceTest {
         verify(restTemplateBuilder, times(2)).build();
         verify(companyRepository).saveAll(companies);
     }
+
+    @Test
+    void shouldGetCompanyFromTruProxyApiGivenCompanyNumberIfActiveFalsePassedAndCompanyActive() {
+
+        var company = new Company();
+        company.setCompanyNumber("12345678");
+        company.setCompanyStatus("active");
+
+        var companies = new ArrayList<Company>();
+        companies.add(company);
+
+        var truProxyApiCompaniesResponse = new TruProxyApiCompaniesResponse();
+        truProxyApiCompaniesResponse.setTotalResults(companies.size());
+        truProxyApiCompaniesResponse.setItems(companies);
+
+        var officer = new TruProxyOfficer();
+        var officers = new ArrayList<TruProxyOfficer>();
+        officers.add(officer);
+
+        var truProxyApiOfficersResponse = new TruProxyApiOfficersResponse();
+        truProxyApiOfficersResponse.setItems(officers);
+
+        when(restTemplateBuilder.build()).thenReturn(restTemplate);
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(TruProxyApiCompaniesResponse.class)))
+                .thenReturn(ResponseEntity.ok(truProxyApiCompaniesResponse));
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(TruProxyApiOfficersResponse.class)))
+                .thenReturn(ResponseEntity.ok(truProxyApiOfficersResponse));
+
+        CompanySearchResponse companySearchResponse = truProxyApiService
+                .getCompaniesAndOfficers(null, "12345678", false, "*** secret-api-key ***");
+
+        assertThat(companySearchResponse.getTotalResults()).isEqualTo(1);
+        assertThat(companySearchResponse.getItems()).hasSize(1);
+        assertThat(companySearchResponse.getItems().get(0).getOfficers()).hasSize(1);
+        verify(restTemplateBuilder, times(2)).build();
+        verify(companyRepository).saveAll(companies);
+    }
+
+    @Test
+    void shouldSaveCompanyIfCompanyNumberPassedIn() {
+
+            var company = new Company();
+            company.setCompanyNumber("12345678");
+            company.setCompanyStatus("active");
+
+            var companies = new ArrayList<Company>();
+            companies.add(company);
+
+            var truProxyApiCompaniesResponse = new TruProxyApiCompaniesResponse();
+            truProxyApiCompaniesResponse.setTotalResults(companies.size());
+            truProxyApiCompaniesResponse.setItems(companies);
+
+            var officer = new TruProxyOfficer();
+            var officers = new ArrayList<TruProxyOfficer>();
+            officers.add(officer);
+
+            var truProxyApiOfficersResponse = new TruProxyApiOfficersResponse();
+            truProxyApiOfficersResponse.setItems(officers);
+
+            when(restTemplateBuilder.build()).thenReturn(restTemplate);
+            when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(TruProxyApiCompaniesResponse.class)))
+                    .thenReturn(ResponseEntity.ok(truProxyApiCompaniesResponse));
+            when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(TruProxyApiOfficersResponse.class)))
+                    .thenReturn(ResponseEntity.ok(truProxyApiOfficersResponse));
+
+            CompanySearchResponse companySearchResponse = truProxyApiService
+                    .getCompaniesAndOfficers("", "12345678", true, "*** secret-api-key ***");
+
+            assertThat(companySearchResponse.getTotalResults()).isEqualTo(1);
+            assertThat(companySearchResponse.getItems()).hasSize(1);
+            assertThat(companySearchResponse.getItems().get(0).getOfficers()).hasSize(1);
+            verify(restTemplateBuilder, times(2)).build();
+            verify(companyRepository).saveAll(companies);
+    }
+
+    @Test
+    void shouldNotSaveCompanyIfCompanyNumberNotPassedIn() {
+
+            var company = new Company();
+            company.setCompanyNumber("12345678");
+            company.setCompanyStatus("active");
+
+            var companies = new ArrayList<Company>();
+            companies.add(company);
+
+            var truProxyApiCompaniesResponse = new TruProxyApiCompaniesResponse();
+            truProxyApiCompaniesResponse.setTotalResults(companies.size());
+            truProxyApiCompaniesResponse.setItems(companies);
+
+            var officer = new TruProxyOfficer();
+            var officers = new ArrayList<TruProxyOfficer>();
+            officers.add(officer);
+
+            var truProxyApiOfficersResponse = new TruProxyApiOfficersResponse();
+            truProxyApiOfficersResponse.setItems(officers);
+
+            when(restTemplateBuilder.build()).thenReturn(restTemplate);
+            when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(TruProxyApiCompaniesResponse.class)))
+                    .thenReturn(ResponseEntity.ok(truProxyApiCompaniesResponse));
+            when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(TruProxyApiOfficersResponse.class)))
+                    .thenReturn(ResponseEntity.ok(truProxyApiOfficersResponse));
+
+            CompanySearchResponse companySearchResponse = truProxyApiService
+                    .getCompaniesAndOfficers("", null, true, "*** secret-api-key ***");
+
+            assertThat(companySearchResponse.getTotalResults()).isEqualTo(1);
+            assertThat(companySearchResponse.getItems()).hasSize(1);
+            assertThat(companySearchResponse.getItems().get(0).getOfficers()).hasSize(1);
+            verify(restTemplateBuilder, times(2)).build();
+            verifyNoInteractions(companyRepository);
+    }
 }
