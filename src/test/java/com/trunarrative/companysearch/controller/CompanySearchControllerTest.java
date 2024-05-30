@@ -186,4 +186,26 @@ class CompanySearchControllerTest {
         assertThat(response.getBody().getItems()).isEmpty();
         verify(truProxyApiService, times(1)).getCompaniesAndOfficers(null, "companyNumber", true, "*** secret-api-key ***");
     }
+
+    @Test
+    void shouldReturnEmptyResponseWhenActiveTrueAndCompanyNotActive() {
+
+        var activeCompanies = true;
+        var apiKey = "*** secret-api-key ***";
+        var companySearchRequest = CompanySearchRequest.builder()
+                .companyName(null)
+                .companyNumber("companyNumber")
+                .build();
+
+        var company = new Company();
+        company.setCompanyStatus("dissolved");
+        when(companyRepository.findByCompanyNumber("companyNumber")).thenReturn(company);
+
+        var response = companySearchController.companySearch(companySearchRequest, activeCompanies, apiKey);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getTotalResults()).isEqualTo(0);
+        assertThat(response.getBody().getItems()).isEmpty();
+    }
 }
